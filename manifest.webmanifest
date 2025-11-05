@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "RangeCheck",
+  "short_name": "RangeCheck",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0d6efd",
+  "description": "Track odometer, range predictions, and charging events. Offline-first with Google Sheets sync.",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAAAAAAC0a0dHAAAAGklEQVR4nO3BMQEAAADCoPVPbQ8HFAAAAAAAAAAAgM0MBwABnQmQ5QAAAABJRU5ErkJggg==", "sizes": "192x192", "type": "image/png" },
+    { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAQAAAB8bLr8AAAAH0lEQVR4nO3BMQEAAADCoPVP7WcPoAAAAAAAAAAA4GMGmQABl2k6tgAAAABJRU5ErkJggg==", "sizes": "512x512", "type": "image/png" }
+  ],
+  "shortcuts": [
+    { "name": "New Entry", "short_name": "New", "url": "./#new" },
+    { "name": "Pending", "short_name": "Pending", "url": "./#pending" }
+  ]
+}

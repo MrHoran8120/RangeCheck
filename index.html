@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RangeCheck – EV Logs</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#0d6efd" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAAAAAAC0a0dHAAAAGklEQVR4nO3BMQEAAADCoPVPbQ8HFAAAAAAAAAAAgM0MBwABnQmQ5QAAAABJRU5ErkJggg==" />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-bar">
+      <h1>RangeCheck</h1>
+      <button id="installBtn" class="secondary" hidden>Install</button>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>New Entry</h2>
+        <form id="entryForm" autocomplete="off">
+          <div class="grid">
+            <label>
+              <span>Date/Time</span>
+              <input type="datetime-local" id="dt" required />
+            </label>
+            <label>
+              <span>Odometer (km)</span>
+              <input type="number" id="odometer" inputmode="decimal" step="0.1" required />
+            </label>
+            <label>
+              <span>Predicted Range (km)</span>
+              <input type="number" id="predictedRange" inputmode="decimal" step="1" required />
+            </label>
+            <label>
+              <span>State of Charge (%)</span>
+              <input type="number" id="soc" inputmode="decimal" step="1" min="0" max="100" />
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="charged" />
+              <span>Charging occurred</span>
+            </label>
+            <label>
+              <span>Notes</span>
+              <input type="text" id="notes" maxlength="160" />
+            </label>
+          </div>
+          <div class="actions">
+            <button type="button" id="locBtn" class="secondary">Add Location</button>
+            <button type="submit">Save Entry</button>
+          </div>
+          <input type="hidden" id="lat" />
+          <input type="hidden" id="lng" />
+        </form>
+        <p id="formMsg" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="card">
+        <h2>Pending Sync</h2>
+        <div class="actions">
+          <label class="settings-inline">
+            <span>Apps Script URL</span>
+            <input id="gasUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+          </label>
+          <button id="saveUrlBtn" class="secondary">Save URL</button>
+          <button id="syncBtn">Sync Now</button>
+        </div>
+        <ul id="pendingList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Recent Entries (local)</h2>
+        <ul id="recentList" class="list"></ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span id="statusDot" class="dot offline" title="offline"></span>
+      <span id="statusText">Offline</span>
+    </footer>
+
+    <script src="js/db.js"></script>
+    <script src="js/sync.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+</html>
