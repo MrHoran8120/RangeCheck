@@ -8,16 +8,23 @@
   const notes = document.getElementById('notes');
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
-  const locBtn = document.getElementById('locBtn');
   const formMsg = document.getElementById('formMsg');
   const pendingList = document.getElementById('pendingList');
   const recentList = document.getElementById('recentList');
-  const gasUrlEl = document.getElementById('gasUrl');
-  const saveUrlBtn = document.getElementById('saveUrlBtn');
   const syncBtn = document.getElementById('syncBtn');
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
   const installBtn = document.getElementById('installBtn');
+  const tabNew = document.getElementById('tabNew');
+  const tabPending = document.getElementById('tabPending');
+  const tabSettings = document.getElementById('tabSettings');
+  const sectionNew = document.getElementById('section-new');
+  const sectionPending = document.getElementById('section-pending');
+  const sectionRecent = document.getElementById('section-recent');
+  const sectionSettings = document.getElementById('section-settings');
+  const autoLocToggle = document.getElementById('autoLocToggle');
+  const locPermBtn = document.getElementById('locPermBtn');
+  const locPermStatus = document.getElementById('locPermStatus');
 
   let deferredPrompt = null;
 
@@ -67,6 +74,9 @@
     return id;
   }
 
+  let watchId = null;
+  let lastPos = null;
+
   async function onSubmit(e) {
     e.preventDefault();
     const now = Date.now();
@@ -77,8 +87,8 @@
       soc: soc.value ? parseFloat(soc.value) : null,
       charged: !!charged.checked,
       notes: notes.value || '',
-      lat: latEl.value ? parseFloat(latEl.value) : null,
-      lng: lngEl.value ? parseFloat(lngEl.value) : null,
+      lat: lastPos ? parseFloat(lastPos.coords.latitude.toFixed(6)) : (latEl.value ? parseFloat(latEl.value) : null),
+      lng: lastPos ? parseFloat(lastPos.coords.longitude.toFixed(6)) : (lngEl.value ? parseFloat(lngEl.value) : null),
       deviceId: deviceId()
     };
     if (Number.isNaN(entry.odometer) || Number.isNaN(entry.predictedRange)) {
@@ -116,22 +126,26 @@
     }
   }
 
-  async function onLocate() {
-    locBtn.disabled = true;
-    locBtn.textContent = 'Locating…';
-    try {
-      if (!('geolocation' in navigator)) throw new Error('No geolocation available');
-      const pos = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 })
-      );
-      latEl.value = pos.coords.latitude.toFixed(6);
-      lngEl.value = pos.coords.longitude.toFixed(6);
-      formMsg.textContent = 'Location added';
-    } catch (e) {
-      formMsg.textContent = 'Location failed';
-    } finally {
-      locBtn.disabled = false;
-      locBtn.textContent = 'Add Location';
+  function ensureLocationWatcher() {
+    const enabled = localStorage.getItem('AUTO_LOC') === '1';
+    autoLocToggle && (autoLocToggle.checked = enabled);
+    if (!('geolocation' in navigator)) {
+      locPermStatus && (locPermStatus.textContent = 'Geolocation not supported');
+      return;
+    }
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+    if (enabled) {
+      watchId = navigator.geolocation.watchPosition((pos) => {
+        lastPos = pos;
+        latEl.value = pos.coords.latitude.toFixed(6);
+        lngEl.value = pos.coords.longitude.toFixed(6);
+        locPermStatus && (locPermStatus.textContent = 'Location active');
+      }, (err) => {
+        locPermStatus && (locPermStatus.textContent = 'Location error: ' + err.message);
+      }, { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 });
     }
   }
 
@@ -151,12 +165,26 @@
   }
 
   function initSettings() {
-    gasUrlEl.value = window.RangeSync.getUrl();
-    saveUrlBtn.addEventListener('click', () => {
-      const url = gasUrlEl.value.trim();
-      window.RangeSync.setUrl(url);
-      formMsg.textContent = url ? 'Saved Apps Script URL.' : 'Cleared Apps Script URL.';
-    });
+    if (autoLocToggle) {
+      autoLocToggle.checked = localStorage.getItem('AUTO_LOC') === '1';
+      autoLocToggle.addEventListener('change', () => {
+        localStorage.setItem('AUTO_LOC', autoLocToggle.checked ? '1' : '0');
+        ensureLocationWatcher();
+      });
+    }
+    if (locPermBtn) {
+      locPermBtn.addEventListener('click', async () => {
+        if (!('geolocation' in navigator)) { locPermStatus.textContent = 'No geolocation available'; return; }
+        try {
+          locPermStatus.textContent = 'Requesting permission…';
+          await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000 }));
+          locPermStatus.textContent = 'Permission granted';
+          ensureLocationWatcher();
+        } catch (e) {
+          locPermStatus.textContent = 'Permission denied or error';
+        }
+      });
+    }
   }
 
   function initConnectivity() {
@@ -166,6 +194,19 @@
     navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'SYNC_REQUEST') onSync();
     });
+  }
+
+  function route() {
+    const hash = (location.hash || '#new').toLowerCase();
+    const show = (el) => el && (el.hidden = false);
+    const hide = (el) => el && (el.hidden = true);
+    hide(sectionNew); hide(sectionPending); hide(sectionRecent); hide(sectionSettings);
+    tabNew && tabNew.classList.remove('active');
+    tabPending && tabPending.classList.remove('active');
+    tabSettings && tabSettings.classList.remove('active');
+    if (hash.startsWith('#pending')) { show(sectionPending); show(sectionRecent); tabPending && tabPending.classList.add('active'); }
+    else if (hash.startsWith('#settings')) { show(sectionSettings); tabSettings && tabSettings.classList.add('active'); }
+    else { show(sectionNew); show(sectionRecent); tabNew && tabNew.classList.add('active'); }
   }
 
   function initDefaults() {
@@ -179,8 +220,10 @@
     initConnectivity();
     form.addEventListener('submit', onSubmit);
     syncBtn.addEventListener('click', onSync);
-    locBtn.addEventListener('click', onLocate);
+    ensureLocationWatcher();
     refreshLists();
+    window.addEventListener('hashchange', route);
+    route();
   }
 
   window.addEventListener('load', init);

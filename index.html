@@ -20,7 +20,15 @@
     </header>
 
     <main class="container">
-      <section class="card">
+      <nav class="tabs">
+        <a href="#new" id="tabNew">New</a>
+        <a href="#pending" id="tabPending">Pending</a>
+        <a href="#settings" id="tabSettings">Settings</a>
+      </nav>
+
+      
+
+      <section id="section-new" class="card view">
         <h2>New Entry</h2>
         <form id="entryForm" autocomplete="off">
           <div class="grid">
@@ -50,7 +58,6 @@
             </label>
           </div>
           <div class="actions">
-            <button type="button" id="locBtn" class="secondary">Add Location</button>
             <button type="submit">Save Entry</button>
           </div>
           <input type="hidden" id="lat" />
@@ -59,22 +66,31 @@
         <p id="formMsg" role="status" aria-live="polite"></p>
       </section>
 
-      <section class="card">
+      <section id="section-pending" class="card view" hidden>
         <h2>Pending Sync</h2>
         <div class="actions">
-          <label class="settings-inline">
-            <span>Apps Script URL</span>
-            <input id="gasUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
-          </label>
-          <button id="saveUrlBtn" class="secondary">Save URL</button>
           <button id="syncBtn">Sync Now</button>
         </div>
         <ul id="pendingList" class="list"></ul>
       </section>
 
-      <section class="card">
+      <section id="section-recent" class="card view">
         <h2>Recent Entries (local)</h2>
         <ul id="recentList" class="list"></ul>
+      </section>
+
+      <section id="section-settings" class="card view" hidden>
+        <h2>Settings</h2>
+        <div class="grid">
+          <label class="checkbox">
+            <input type="checkbox" id="autoLocToggle" />
+            <span>Automatically capture location for entries</span>
+          </label>
+          <div class="actions">
+            <button id="locPermBtn" class="secondary">Request Location Permission</button>
+            <small id="locPermStatus"></small>
+          </div>
+        </div>
       </section>
     </main>
 

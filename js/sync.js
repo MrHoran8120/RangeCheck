@@ -1,17 +1,12 @@
 (() => {
-  const KEY_URL = 'GAS_WEB_APP_URL';
+  // Hard-coded Apps Script Web App URL (as requested)
+  const FIXED_URL = 'https://script.google.com/macros/s/AKfycbxBwenBqJTFfKrF-x_ld7gcJJwF_3d_y7ttR4EATPskj_t7P2ayDuArweot6L3mvDctDg/exec';
 
-  function getUrl() {
-    return localStorage.getItem(KEY_URL) || '';
-  }
-  function setUrl(url) {
-    if (!url) localStorage.removeItem(KEY_URL);
-    else localStorage.setItem(KEY_URL, url);
-  }
+  function getUrl() { return FIXED_URL; }
+  function setUrl(_) { /* no-op; URL is fixed */ }
 
   async function syncNow() {
     const url = getUrl();
-    if (!url) throw new Error('No Apps Script URL set.');
     const pending = await window.RangeDB.listPending();
     if (!pending.length) return { uploaded: 0 };
     const payload = pending.map(p => ({

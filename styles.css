@@ -26,3 +26,9 @@ button:disabled { opacity:.6; cursor:not-allowed; }
 .dot.offline { background:var(--err); }
 .dot.online { background:var(--ok); }
 
+.tabs { display:flex; gap:8px; margin:8px 0 12px; }
+.tabs a { color:var(--muted); text-decoration:none; padding:8px 12px; border:1px solid #24324d; border-radius:8px; background:#0e1532; }
+.tabs a:hover { color:#fff; border-color:#2a3a60; }
+.tabs a.active { color:#fff; background:#132044; border-color:#2a3a60; }
+.view[hidden] { display:none; }
+.notice { background:#2a3a60; color:#e9eef7; padding:10px 12px; border-radius:8px; border:1px solid #3a4c78; margin:10px 0; }
