@@ -6,10 +6,6 @@
     <title>RangeCheck – EV Logs</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#0d6efd" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADAAAAAAAC0a0dHAAAAGklEQVR4nO3BMQEAAADCoPVPbQ8HFAAAAAAAAAAAgM0MBwABnQmQ5QAAAABJRU5ErkJggg==" />
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -20,23 +16,12 @@
     </header>
 
     <main class="container">
-      <nav class="tabs">
-        <a href="#new" id="tabNew">New</a>
-        <a href="#pending" id="tabPending">Pending</a>
-        <a href="#settings" id="tabSettings">Settings</a>
-      </nav>
-
-      <div id="reminder" class="notice" hidden>
-        Set your Google Apps Script URL in Settings to enable syncing.
-        <a href="#settings">Open Settings</a>
-      </div>
-
-      <section id="section-new" class="card view">
+      <section class="card">
         <h2>New Entry</h2>
         <form id="entryForm" autocomplete="off">
           <div class="grid">
             <label>
-              <span>Date/Time</span>
+              <span>Date/Time</span> 0
               <input type="datetime-local" id="dt" required />
             </label>
             <label>
@@ -61,6 +46,7 @@
             </label>
           </div>
           <div class="actions">
+            <button type="button" id="locBtn" class="secondary">Add Location</button>
             <button type="submit">Save Entry</button>
           </div>
           <input type="hidden" id="lat" />
@@ -69,39 +55,22 @@
         <p id="formMsg" role="status" aria-live="polite"></p>
       </section>
 
-      <section id="section-pending" class="card view" hidden>
+      <section class="card">
         <h2>Pending Sync</h2>
         <div class="actions">
+          <label class="settings-inline">
+            <span>Apps Script URL</span>
+            <input id="gasUrl" type="url" placeholder="https://script.google.com/macros/s/AKfycbyxYMiwjfCwCTHFD6V4AP3kFI-J1lVKc_q2gOe_eIjsQREDQjmkkhz8OCBYivrmxRlukw/exec" />
+          </label>
+          <button id="saveUrlBtn" class="secondary">Save URL</button>
           <button id="syncBtn">Sync Now</button>
         </div>
         <ul id="pendingList" class="list"></ul>
       </section>
 
-      <section id="section-recent" class="card view">
+      <section class="card">
         <h2>Recent Entries (local)</h2>
         <ul id="recentList" class="list"></ul>
-      </section>
-
-      <section id="section-settings" class="card view" hidden>
-        <h2>Settings</h2>
-        <div class="grid">
-          <label class="settings-inline">
-            <span>Apps Script URL</span>
-            <input id="settingsGasUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
-          </label>
-          <div class="actions">
-            <button id="settingsSaveUrl" class="secondary">Save URL</button>
-          </div>
-
-          <label class="checkbox">
-            <input type="checkbox" id="autoLocToggle" />
-            <span>Automatically capture location for entries</span>
-          </label>
-          <div class="actions">
-            <button id="locPermBtn" class="secondary">Request Location Permission</button>
-            <small id="locPermStatus"></small>
-          </div>
-        </div>
       </section>
     </main>
 
