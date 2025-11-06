@@ -18,10 +18,13 @@
   const tabNew = document.getElementById('tabNew');
   const tabPending = document.getElementById('tabPending');
   const tabSettings = document.getElementById('tabSettings');
+  const reminder = document.getElementById('reminder');
   const sectionNew = document.getElementById('section-new');
   const sectionPending = document.getElementById('section-pending');
   const sectionRecent = document.getElementById('section-recent');
   const sectionSettings = document.getElementById('section-settings');
+  const settingsGasUrl = document.getElementById('settingsGasUrl');
+  const settingsSaveUrl = document.getElementById('settingsSaveUrl');
   const autoLocToggle = document.getElementById('autoLocToggle');
   const locPermBtn = document.getElementById('locPermBtn');
   const locPermStatus = document.getElementById('locPermStatus');
@@ -165,6 +168,13 @@
   }
 
   function initSettings() {
+    if (settingsGasUrl) settingsGasUrl.value = window.RangeSync.getUrl();
+    settingsSaveUrl && settingsSaveUrl.addEventListener('click', () => {
+      const url = settingsGasUrl.value.trim();
+      window.RangeSync.setUrl(url);
+      formMsg.textContent = url ? 'Saved Apps Script URL.' : 'Cleared Apps Script URL.';
+      updateReminder();
+    });
     if (autoLocToggle) {
       autoLocToggle.checked = localStorage.getItem('AUTO_LOC') === '1';
       autoLocToggle.addEventListener('change', () => {
@@ -196,6 +206,11 @@
     });
   }
 
+  function updateReminder() {
+    const hasUrl = !!window.RangeSync.getUrl();
+    if (reminder) reminder.hidden = hasUrl;
+  }
+
   function route() {
     const hash = (location.hash || '#new').toLowerCase();
     const show = (el) => el && (el.hidden = false);
@@ -222,7 +237,10 @@
     syncBtn.addEventListener('click', onSync);
     ensureLocationWatcher();
     refreshLists();
+    updateReminder();
     window.addEventListener('hashchange', route);
+    // first-run: take user to settings if URL not set
+    if (!window.RangeSync.getUrl()) location.hash = '#settings';
     route();
   }
 
