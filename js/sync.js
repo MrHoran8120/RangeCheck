@@ -1,10 +1,12 @@
 (() => {
   const KEY_URL = 'GAS_WEB_APP_URL';
+  const HARDCODED_URL = (window.APP_CONFIG && window.APP_CONFIG.gasUrl) || '';
 
   function getUrl() {
-    return localStorage.getItem(KEY_URL) || '';
+    return HARDCODED_URL || localStorage.getItem(KEY_URL) || '';
   }
   function setUrl(url) {
+    if (HARDCODED_URL) return; // URL is hard-coded; ignore setter
     if (!url) localStorage.removeItem(KEY_URL);
     else localStorage.setItem(KEY_URL, url);
   }

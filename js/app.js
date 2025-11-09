@@ -104,6 +104,9 @@
       form.reset();
       dt.value = toLocalDateTime(now);
       await refreshLists();
+      if (navigator.onLine && window.RangeSync.getUrl()) {
+        try { await onSync(); } catch {}
+      }
       window.RangeSync.tryBackgroundSync();
     } catch (err) {
       formMsg.textContent = 'Error saving entry: ' + (err && err.message ? err.message : String(err));
@@ -112,7 +115,7 @@
   }
 
   async function onSync() {
-    syncBtn.disabled = true;
+    if (syncBtn) syncBtn.disabled = true;
     syncBtn.textContent = 'Syncing…';
     try {
       const res = await window.RangeSync.syncNow();
